@@ -9,8 +9,8 @@ import { Toaster } from 'sonner';
 const outfit = { variable: "font-sans" }; // Mock
 
 export const metadata: Metadata = {
-  title: "Clarity | Intelligent Journaling",
-  description: "Journaling adapted to your mind.",
+  title: "Reflections | Personalized Journaling",
+  description: "Personalized, MBTI-aware journaling.",
 };
 
 export default function RootLayout({

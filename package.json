@@ -1,7 +1,7 @@
 {
-  "name": "productivity",
+  "name": "personalized-journaling",
   "version": "1.0.0",
-  "description": "random project to help me improve my productivity😛",
+  "description": "A personalized, MBTI-aware journaling app",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",

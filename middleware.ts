@@ -9,7 +9,7 @@ export default auth((req) => {
     const { pathname } = req.nextUrl;
 
     // Define protected routes
-    const protectedRoutes = ['/dashboard', '/journal', '/tasks', '/habits', '/profile', '/settings'];
+    const protectedRoutes = ['/dashboard', '/journal', '/profile', '/settings'];
     const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
     // Redirect to login if accessing protected route while not logged in

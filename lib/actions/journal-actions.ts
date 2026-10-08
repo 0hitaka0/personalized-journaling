@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/db';
-import { getAuthenticatedUserId } from '@/lib/actions/habit-actions';
+import { getAuthenticatedUserId } from '@/lib/actions/auth-actions';
 
 export async function getRecentJournalEntries(limit = 5) {
     const userId = await getAuthenticatedUserId();

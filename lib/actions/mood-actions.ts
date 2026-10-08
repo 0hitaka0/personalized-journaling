@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/db';
-import { getAuthenticatedUserId } from '@/lib/actions/habit-actions';
+import { getAuthenticatedUserId } from '@/lib/actions/auth-actions';
 import { revalidatePath } from 'next/cache';
 
 export interface MoodEntryData {

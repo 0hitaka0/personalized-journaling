@@ -1,7 +1,7 @@
 # Project Documentation (AGENT.md)
 
 ## Project Overview
-"Productivity" is a Next.js 15 application designed to help users improve productivity through features like Journaling, Habit Tracking, Task Management, and MBTI-based personalization.
+"Reflections" is a Next.js application for personalized, MBTI-aware journaling, with mood tracking, goals, and writing insights.
 
 **Tech Stack:**
 - **Framework:** Next.js 15 (App Router)
@@ -33,7 +33,6 @@
 ## Domain Knowledge
 - **MBTI**: The app personalizes content based on the user's MBTI type.
 - **Journaling**: Users can create entries with rich text (Tiptap).
-- **Habits**: Tracks daily habits and streaks.
 - **Life Streak**: An analytics metric tracking consistency.
 
 ## Do's and Don'ts
@@ -61,9 +60,9 @@ cp .env.example .env
 - `NEXTAUTH_URL`: `http://localhost:3000` (for dev).
 
 **Optional (External Services):**
-- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: For Google Calendar integration.
+- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: Optional, for Google sign-in.
     - Create credentials in Google Cloud Console.
-    - Authorized Redirect URI: `http://localhost:3000/api/auth/callback/google`
+    - Authorized Redirect URI: `http://localhost:3000/api/auth/callback/google` (sign-in only)
 
 ### 2. Database Setup
 ```bash

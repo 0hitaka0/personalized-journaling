@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/components/auth-provider';
-import { Loader2, PenLine, CheckSquare, Target, Sparkles, ArrowRight, Book } from 'lucide-react';
+import { Loader2, PenLine, Sparkles, ArrowRight, Book } from 'lucide-react';
 import Link from 'next/link';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PersonalizedGreeting } from '@/components/personalized-greeting';
@@ -16,14 +16,12 @@ import { LifeStreakCard } from './life-streak-card';
 import { LifeStreakAnalytics } from '@/lib/actions/analytics-actions';
 
 interface DashboardContentProps {
-    initialTasks: any[];
-    initialHabits: any[];
     initialEntries: any[];
     lifeStreak: LifeStreakAnalytics;
     showWelcome: boolean;
 }
 
-export function DashboardContent({ initialTasks, initialHabits, initialEntries, lifeStreak, showWelcome }: DashboardContentProps) {
+export function DashboardContent({ initialEntries, lifeStreak, showWelcome }: DashboardContentProps) {
     const { user, isLoading } = useAuth();
     const { type: mbtiType } = useMBTI();
     const userType = mbtiType as MBTIType | undefined;
@@ -66,7 +64,7 @@ export function DashboardContent({ initialTasks, initialHabits, initialEntries, 
                 <Link href="/journal/new">
                     <button className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-6 py-3 rounded-full transition-all shadow-lg shadow-purple-600/20 font-medium group border border-white/10">
                         <PenLine className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        <span>Log Journey</span>
+                        <span>New Entry</span>
                     </button>
                 </Link>
             </div>
@@ -102,10 +100,8 @@ export function DashboardContent({ initialTasks, initialHabits, initialEntries, 
                         <LifeStreakCard data={lifeStreak} />
                     </motion.div>
 
-                    {/* Middle Row: Content */}
-
-                    {/* Journal Entries List - Replaces "Entries" concept */}
-                    <motion.div variants={item} className="lg:col-span-6 bg-slate-900/40 border border-white/5 rounded-2xl p-4 backdrop-blur-sm relative overflow-hidden group min-h-[300px]">
+                    {/* Recent Journal Entries */}
+                    <motion.div variants={item} className="lg:col-span-12 bg-slate-900/40 border border-white/5 rounded-2xl p-4 backdrop-blur-sm relative overflow-hidden group min-h-[300px]">
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <div className="flex justify-between items-center mb-4 relative z-10">
                             <div className="flex items-center gap-3">
@@ -146,57 +142,6 @@ export function DashboardContent({ initialTasks, initialHabits, initialEntries, 
                             )}
                         </div>
                     </motion.div>
-
-                    {/* Right Column: Split into Tasks and Habits */}
-                    <div className="lg:col-span-6 grid grid-cols-1 gap-4">
-                        {/* Tasks */}
-                        <motion.div variants={item} className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 backdrop-blur-sm relative overflow-hidden group">
-                            <div className="flex justify-between items-center mb-3 relative z-10">
-                                <div className="flex items-center gap-2">
-                                    <CheckSquare className="w-4 h-4 text-blue-400" />
-                                    <h3 className="text-md font-medium text-white">Daily Focus</h3>
-                                </div>
-                                <Link href="/tasks" className="text-[10px] uppercase text-slate-500 hover:text-white transition-colors">View Board</Link>
-                            </div>
-                            <div className="space-y-2 relative z-10">
-                                {initialTasks.length > 0 ? (
-                                    initialTasks.slice(0, 3).map((task: any) => (
-                                        <div key={task.id} className="flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-white/5">
-                                            <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-red-500' : 'bg-slate-500'}`} />
-                                            <span className="text-sm text-slate-200 line-clamp-1">{task.title}</span>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-xs text-slate-500 py-4 text-center">No tasks for today.</p>
-                                )}
-                            </div>
-                        </motion.div>
-
-                        {/* Habits */}
-                        <motion.div variants={item} className="bg-slate-900/40 border border-white/5 rounded-2xl p-4 backdrop-blur-sm relative overflow-hidden group">
-                            <div className="flex justify-between items-center mb-3 relative z-10">
-                                <div className="flex items-center gap-2">
-                                    <Target className="w-4 h-4 text-emerald-400" />
-                                    <h3 className="text-md font-medium text-white">Habit Reminders</h3>
-                                </div>
-                                <Link href="/habits" className="text-[10px] uppercase text-slate-500 hover:text-white transition-colors">Tracker</Link>
-                            </div>
-                            <div className="space-y-2 relative z-10">
-                                {initialHabits.length > 0 ? (
-                                    initialHabits.slice(0, 3).map((habit: any) => (
-                                        <div key={habit.id} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-md">{habit.icon || '📝'}</span>
-                                                <span className="text-sm text-slate-200">{habit.name}</span>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-xs text-slate-500 py-4 text-center">No habits due today.</p>
-                                )}
-                            </div>
-                        </motion.div>
-                    </div>
 
                 </motion.div>
             </ScrollArea>

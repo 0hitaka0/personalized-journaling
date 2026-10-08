@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Flame, Brain, Smile } from 'lucide-react';
+import { PenLine, Flame, Brain, Smile } from 'lucide-react';
 import { LifeStreakAnalytics } from '@/lib/actions/analytics-actions';
 import { cn } from '@/lib/utils';
 import { useMBTI } from '@/components/providers/mbti-provider';
@@ -19,10 +19,10 @@ export function LifeStreakCard({ data }: LifeStreakCardProps) {
 
     const metrics = [
         {
-            label: 'Task Velocity',
-            value: `${data.tasksCompletedThisWeek}`,
-            subtext: 'tasks completed this week',
-            icon: CheckCircle2,
+            label: 'Entries This Week',
+            value: `${data.entriesThisWeek}`,
+            subtext: 'journal entries written',
+            icon: PenLine,
             color: 'text-blue-400',
             bg: 'bg-blue-500/10',
             borderColor: 'border-blue-500/20'
@@ -37,8 +37,8 @@ export function LifeStreakCard({ data }: LifeStreakCardProps) {
             borderColor: 'border-purple-500/20'
         },
         {
-            label: 'Habit Resilience',
-            value: `${data.highestHabitStreak}`,
+            label: 'Writing Streak',
+            value: `${data.longestEntryStreak}`,
             subtext: 'days best streak',
             icon: Flame,
             color: 'text-orange-400',

@@ -3,37 +3,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: hitaka-web
-    restart: always
+    container_name: personalized-journaling-web
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/productivity?schema=public
+      # SQLite database stored on the mounted volume
+      - DATABASE_URL=file:/data/prod.db
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=http://localhost:3000
-    depends_on:
-      - db
-    networks:
-      - hitaka-network
-
-  db:
-    image: postgres:15-alpine
-    container_name: hitaka-db
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=productivity
-    ports:
-      - "5433:5432"
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - journaling_data:/data
     networks:
-      - hitaka-network
+      - journaling-network
 
 networks:
-  hitaka-network:
+  journaling-network:
     driver: bridge
 
 volumes:
-  pgdata:
+  journaling_data:

@@ -6,8 +6,6 @@ import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  CheckSquare,
-  Repeat,
   Book,
   Settings,
   LogOut,
@@ -24,16 +22,6 @@ const sidebarItems = [
     icon: LayoutDashboard,
     label: "Dashboard",
     href: "/dashboard",
-  },
-  {
-    icon: CheckSquare,
-    label: "Tasks",
-    href: "/tasks",
-  },
-  {
-    icon: Repeat,
-    label: "Habits",
-    href: "/habits",
   },
   {
     icon: Book,
@@ -61,7 +49,7 @@ export function Sidebar() {
       <div className="flex h-16 items-center px-6 border-b transition-colors duration-500"
         style={{ borderColor: `${profile.theme.primary}30` }}>
         <h1 className="text-xl font-light tracking-tighter text-slate-200 drop-shadow-sm">
-          Clarity
+          Reflections
         </h1>
         <span className="ml-2 text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded text-black font-bold"
           style={{ backgroundColor: profile.theme.primary }}>

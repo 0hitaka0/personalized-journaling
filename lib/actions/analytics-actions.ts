@@ -1,12 +1,12 @@
 'use server';
 
 import { prisma } from '@/lib/db';
-import { getAuthenticatedUserId } from '@/lib/actions/habit-actions';
+import { getAuthenticatedUserId } from '@/lib/actions/auth-actions';
 import { startOfWeek, endOfWeek, subDays, format } from 'date-fns';
 
 export interface LifeStreakAnalytics {
-    tasksCompletedThisWeek: number;
-    highestHabitStreak: number;
+    entriesThisWeek: number;
+    longestEntryStreak: number;
     avgMoodThisWeek: number | null;
     avgMoodLabel: string;
     reflectionDays: number;
@@ -17,12 +17,22 @@ export interface LifeStreakAnalytics {
     }[];
 }
 
+const getMoodLabel = (val: number | null) => {
+    if (!val) return 'No Data';
+    if (val >= 9) return 'Ecstatic';
+    if (val >= 8) return 'Great';
+    if (val >= 7) return 'Good';
+    if (val >= 5) return 'Okay';
+    if (val >= 3) return 'Low';
+    return 'Bad';
+};
+
 export async function getLifeStreakAnalytics(): Promise<LifeStreakAnalytics> {
     const userId = await getAuthenticatedUserId();
     if (!userId) {
         return {
-            tasksCompletedThisWeek: 0,
-            highestHabitStreak: 0,
+            entriesThisWeek: 0,
+            longestEntryStreak: 0,
             avgMoodThisWeek: 0,
             avgMoodLabel: 'Neutral',
             reflectionDays: 0,
@@ -32,39 +42,8 @@ export async function getLifeStreakAnalytics(): Promise<LifeStreakAnalytics> {
 
     const today = new Date();
     const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
-    const endOfCurrentWeek = endOfWeek(today, { weekStartsOn: 1 });
-    const sevenDaysAgo = subDays(today, 6); // Last 7 days rolling window
 
-    // 1. Tasks Done within a week (This Week)
-    const tasksCompleted = await prisma.task.count({
-        where: {
-            userId,
-            status: 'done',
-            completedAt: {
-                gte: startOfCurrentWeek
-            }
-        }
-    });
-
-    // 2. Highest Habit Streak (All Time or Active) - Let's get highest ACTIVE or just highest recorded prop
-    const habits = await prisma.habit.findMany({
-        where: {
-            userId,
-            isActive: true
-        },
-        select: {
-            streak: true,
-            longestStreak: true
-        }
-    });
-
-    // Calculate max streak a user can maintain (longest streak recorded)
-    const highestHabitStreak = habits.reduce((max, h) => Math.max(max, h.streak), 0);
-    // Alternatively, use longestStreak if we populated it correctly, but streak is current.
-    // User asked "how many streak user can maintain", implying capability, so longestStreak might be better if reliable.
-    // Let's stick to current max streak for "maintain" context or highest current.
-
-    // 3. Mood Average within a week
+    // 1. Mood Average within a week
     const moods = await prisma.mood.findMany({
         where: {
             userId,
@@ -83,34 +62,47 @@ export async function getLifeStreakAnalytics(): Promise<LifeStreakAnalytics> {
         avgMood = Math.round((sum / moods.length) * 10) / 10;
     }
 
-    const getMoodLabel = (val: number | null) => {
-        if (!val) return 'No Data';
-        if (val >= 9) return 'Ecstatic';
-        if (val >= 8) return 'Great';
-        if (val >= 7) return 'Good';
-        if (val >= 5) return 'Okay';
-        if (val >= 3) return 'Low';
-        return 'Bad';
-    };
-
-    // 4. Daily Reflection (Journal Entries) for a week
-    // Check how many unique DAYS have a journal entry
+    // 2. Journal entries this week + reflection days + writing streak
     const journalEntries = await prisma.journalEntry.findMany({
         where: {
             userId,
-            createdAt: {
-                gte: startOfCurrentWeek
-            }
+            isArchived: false,
+            deletedAt: null
         },
         select: {
             createdAt: true
+        },
+        orderBy: {
+            createdAt: 'desc'
         }
     });
 
-    const uniqueReflectionDays = new Set(
+    const entriesThisWeek = journalEntries.filter(
+        e => e.createdAt >= startOfCurrentWeek
+    ).length;
+
+    const dayKeys = new Set(
         journalEntries.map(e => format(e.createdAt, 'yyyy-MM-dd'))
+    );
+
+    const uniqueReflectionDays = new Set(
+        journalEntries
+            .filter(e => e.createdAt >= startOfCurrentWeek)
+            .map(e => format(e.createdAt, 'yyyy-MM-dd'))
     ).size;
 
+    // Longest run of consecutive days (ending today or earlier) with an entry
+    let longestEntryStreak = 0;
+    let currentStreak = 0;
+    for (let i = 0; i < 365; i++) {
+        const key = format(subDays(today, i), 'yyyy-MM-dd');
+        if (dayKeys.has(key)) {
+            currentStreak += 1;
+            longestEntryStreak = Math.max(longestEntryStreak, currentStreak);
+        } else {
+            currentStreak = 0;
+        }
+    }
 
     // Formatted Mood History for Chart
     const moodHistory = moods.map(m => ({
@@ -120,8 +112,8 @@ export async function getLifeStreakAnalytics(): Promise<LifeStreakAnalytics> {
     }));
 
     return {
-        tasksCompletedThisWeek: tasksCompleted,
-        highestHabitStreak,
+        entriesThisWeek,
+        longestEntryStreak,
         avgMoodThisWeek: avgMood,
         avgMoodLabel: getMoodLabel(avgMood),
         reflectionDays: uniqueReflectionDays,

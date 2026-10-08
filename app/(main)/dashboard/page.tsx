@@ -1,12 +1,7 @@
-
 import { Suspense } from 'react';
-import { getDailyTasks } from '@/lib/actions/task-actions';
-import { getHabits } from '@/lib/actions/habit-actions';
 import { DashboardContent } from './components/dashboard-content';
 import { Loader2 } from 'lucide-react';
-import { getAuthenticatedUserId } from '@/lib/actions/habit-actions';
 import { getRecentJournalEntries } from '@/lib/actions/journal-actions';
-
 import { getLifeStreakAnalytics } from '@/lib/actions/analytics-actions';
 
 // Ensure this is a server component
@@ -17,20 +12,11 @@ export default async function DashboardPage({
 }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const userId = await getAuthenticatedUserId();
-
     // Fetch Data in Parallel
-    const [tasks, habits, entries, analytics] = await Promise.all([
-        getDailyTasks(),
-        getHabits(),
+    const [entries, analytics] = await Promise.all([
         getRecentJournalEntries(5),
         getLifeStreakAnalytics()
     ]);
-
-    // Filter Habits for Today (simple logic: check if 'targetDays' includes today's short name)
-    const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    const todayShort = days[new Date().getDay()];
-    const todayHabits = habits.filter(h => h.targetDays && Array.isArray(h.targetDays) && h.targetDays.includes(todayShort));
 
     // Handle search params safely
     const resolvedParams = await searchParams;
@@ -43,8 +29,6 @@ export default async function DashboardPage({
             </div>
         }>
             <DashboardContent
-                initialTasks={tasks}
-                initialHabits={todayHabits}
                 initialEntries={entries}
                 lifeStreak={analytics}
                 showWelcome={showWelcome}
@@ -52,4 +36,3 @@ export default async function DashboardPage({
         </Suspense>
     );
 }
-
